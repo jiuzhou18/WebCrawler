@@ -31,14 +31,15 @@ for item in items:
         story, number = re.subn('<br/>', '\n', item[1]) 
         print("content:")
         print(story)
-        print("laughed number:", item[3], "\n")
-        print("item4:",item[4])
-        pattern_try = re.compile('<span class="cmt-name">(.*?)</span>', re.S)
+        print("laughed number:", item[3])
+#         print("item4:", item[4])
+        pattern_try = re.compile('<span class="cmt-name">(.*?)</span>'+
+                                 '.*?<div class="main-text">.(.*?).<div', re.S)
         hasComment = re.findall(pattern_try, item[4])  
-#                              '.*?<div class="main-text">.(.*?).<div', item[4], re.S) 
-        print(hasComment)
         if hasComment:
-            print("%s\n" %(hasComment.group(1)))
+            for e in hasComment:
+                print("Great comment:",e[1],". Author:", e[0])
+        print()
 
 
 
