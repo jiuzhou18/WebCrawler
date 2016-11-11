@@ -1,6 +1,7 @@
 import urllib
 import urllib.request as urllib2
 import re
+from pip._vendor.distlib.compat import raw_input
 
 class qiushibaike:
     
@@ -18,7 +19,7 @@ class qiushibaike:
             request = urllib2.Request(url, headers = self.headers)
             result = urllib2.urlopen(request)
             content = result.read().decode('utf-8')
-            return result    
+            return content    
         except urllib2.HTTPError as e:
             if hasattr(e, 'code'):
                 print("Error code:", e.code)
@@ -50,26 +51,37 @@ class qiushibaike:
                 pageStories = self.getPageInfo(self.pageIndex)
                 if pageStories:
                     self.stories.append(pageStories)
-                    self.pageIndex++
+                    self.pageIndex+=1
     
     def getOneStory(self, pageStories, page):
-        for stroy in pageStories:
-            
-
-items = re.findall(pattern_comment, content)
-for item in items:
-    haveImg = re.search('class="thumb"', item[2]) 
-    if not haveImg:
-        print("author:", item[0])
-        story, number = re.subn('<br/>', '\n', item[1]) 
-        print("content:")
-        print(story)
-        print("laughed number:", item[3])
-#         print("item4:", item[4])
-        pattern_try = re.compile('<span class="cmt-name">(.*?)</span>'+
+        print("page: %d.\n" %page)
+        for story in pageStories:
+            input = raw_input()
+#             self.loadPage()
+            if input == 'Q':
+                self.enable = False
+                return
+            print("Author: %s\nContent:\n%s\nLaughed number:%s" %(story[0], story[1], story[2]))
+            pattern_try = re.compile('<span class="cmt-name">(.*?)</span>'+
                                  '.*?<div class="main-text">.(.*?).<div', re.S)
-        hasComment = re.findall(pattern_try, item[4])  
-        if hasComment:
-            for e in hasComment:
-                print("Great comment:",e[1],". Author:", e[0])
-        print()
+            hasComment = re.findall(pattern_try, story[3])
+            if hasComment:
+                for e in hasComment:
+                    print("Great comment",e[1],".\nComment author: ",e[0], end ="")
+            print()   
+
+
+    def start(self):
+        print("Loading qiushibaike...\n")
+        self.enable = True
+        self.loadPage()
+        while self.enable:
+            self.loadPage()
+            if len(self.stories)>0:
+                onePage = self.stories[0]
+                del self.stories
+                self.getOneStory(onePage, self.pageIndex-1)
+
+
+spider = qiushibaike()
+spider.start()
